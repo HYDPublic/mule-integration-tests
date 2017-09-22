@@ -35,7 +35,6 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
@@ -63,7 +62,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
-  private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion("4.0.0");
   private final boolean validateXml;
 
   @Parameterized.Parameters(name = "Validate XML: {0}")
@@ -122,7 +120,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(4));
+    assertThat(configurationModel.getAllParameterModels().size(), is(5));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("configParam"));
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("defaultConfigParam"));
 
@@ -156,7 +154,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(4));
+    assertThat(configurationModel.getAllParameterModels().size(), is(5));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("someUserConfig"));
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("somePassConfig"));
     assertThat(configurationModel.getAllParameterModels().get(2).getName(), is("port"));
@@ -273,7 +271,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
     final List<ParameterModel> configurationParameterModels = configurationModel.getAllParameterModels();
-    assertThat(configurationParameterModels.size(), is(4));
+    assertThat(configurationParameterModels.size(), is(5));
     assertThat(configurationParameterModels.get(0).getName(), is("aPropertyWithDoc"));
     assertThat(configurationParameterModels.get(0).getDescription(), is("Documentation for the property"));
 
@@ -386,7 +384,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
       ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
       assertThat(configurationModel.getName(), is(CONFIG_NAME));
-      assertThat(configurationModel.getAllParameterModels().size(), is(1));
+      assertThat(configurationModel.getAllParameterModels().size(), is(2));
 
       Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
           configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
@@ -452,3 +450,48 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 }
+
+//    nested
+//    flows-using-module-global-elements-another-proxy.xml
+//    flows-using-module-global-elements-another-proxy-and-module-global-elements.xml
+//    flows-using-module-global-elements-proxy.xml
+
+//flows-test-connection-modules.xml
+//    flows-using-module-calling-operations-within-module-with-global-elements.xml
+//    flows-using-module-global-elements.xml
+//    flows-using-module-global-elements-with-expressions.xml
+//    flows-using-module-multiple-global-elements.xml
+//    flows-using-module-multiple-global-elements-connection.xml
+//    flows-using-module-using-streaming.xml
+//    flows-with-module-using-jms.xml
+
+// validation
+//module-wrong-body-content.xml
+
+//nested
+//    module-calling-operations-within-module-proxy.xml
+//    module-global-element-another-proxy.xml
+//    module-global-element-proxy.xml
+//    module-simple-proxy.xml
+
+//module-calling-operations-within-module.xml
+//module-calling-operations-within-module-with-global-elements.xml
+//module-documentation.xml
+//module-global-element.xml
+//module-json-custom-types.xml
+//module-json-custom-types-catalog.xml
+//module-json-custom-types-type1-schema.json
+//module-json-custom-types-type2-schema.json
+//module-multiple-global-elements.xml
+//module-multiple-global-elements-connection.xml
+//module-properties.xml
+//module-simple.xml
+//module-test-connection-multiple-connectors-uses-file.xml
+//module-test-connection-multiple-connectors-uses-http.xml
+//module-using-jms.xml
+//module-using-streaming.xml
+//module-xsd-custom-types.xml
+//module-xsd-custom-types-catalog.xml
+//module-xsd-custom-types-type1-schema.xsd
+//module-xsd-custom-types-type2-schema.xsd
+//module-xsd-custom-types-type3-schema.xsd
