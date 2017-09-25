@@ -10,7 +10,8 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
+
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -25,9 +26,15 @@ public class TransformationContentTypeTestCase extends AbstractIntegrationTestCa
   @Test
   public void testReturnType() throws Exception {
     String inputMessage = "ABCDEF";
-    BaseEvent event = flowRunner("test").withPayload(inputMessage).run();
+    CoreEvent event = flowRunner("test").withPayload(inputMessage).run();
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(), is("text"));
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getSubType(), is("plain"));
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
   }
+
+  @Test
+  public void testFlow() throws Exception {
+    CoreEvent event = flowRunner("test").withPayload("ABCDEF").run();
+  }
+
 }
