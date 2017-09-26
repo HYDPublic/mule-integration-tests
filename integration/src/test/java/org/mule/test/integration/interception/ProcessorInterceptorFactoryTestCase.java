@@ -21,23 +21,15 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
-import static org.mule.test.allure.AllureConstants.InterceptonApi.ComponentInterceptionStory.COMPONENT_INTERCEPTION_STORY;
 import static org.mule.test.allure.AllureConstants.InterceptonApi.INTERCEPTION_API;
+import static org.mule.test.allure.AllureConstants.InterceptonApi.ComponentInterceptionStory.COMPONENT_INTERCEPTION_STORY;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.getActiveConnections;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.getConnects;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.getDisconnects;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.interception.InterceptionAction;
@@ -46,9 +38,6 @@ import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -58,9 +47,15 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.KillParameters;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import javax.inject.Inject;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +64,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import javax.inject.Inject;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(INTERCEPTION_API)
 @Story(COMPONENT_INTERCEPTION_STORY)
@@ -95,24 +96,15 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
   }
 
   @Override
-  protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, ProcessorInterceptorFactory> interceptorFactories = new HashMap<>();
 
-    builders.add(new ConfigurationBuilder() {
+    interceptorFactories.put("_AfterWithCallbackInterceptor", () -> new AfterWithCallbackInterceptor());
+    interceptorFactories.put("_HasInjectedAttributesInterceptorFactory",
+                             new HasInjectedAttributesInterceptorFactory(mutateEventBefore));
+    interceptorFactories.put("_EvaluatesExpressionInterceptorFactory", new EvaluatesExpressionInterceptorFactory());
 
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        muleContext.getProcessorInterceptorManager().addInterceptorFactory(() -> new AfterWithCallbackInterceptor());
-        muleContext.getProcessorInterceptorManager()
-            .addInterceptorFactory(new HasInjectedAttributesInterceptorFactory(mutateEventBefore));
-        muleContext.getProcessorInterceptorManager().addInterceptorFactory(new EvaluatesExpressionInterceptorFactory());
-      }
-
-      @Override
-      public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
-        // Nothing to do
-      }
-    });
+    return (Map) interceptorFactories;
   }
 
   @Before
