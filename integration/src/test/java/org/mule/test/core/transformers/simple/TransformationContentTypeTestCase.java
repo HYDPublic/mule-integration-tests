@@ -32,9 +32,4 @@ public class TransformationContentTypeTestCase extends AbstractIntegrationTestCa
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
   }
 
-  @Test
-  public void testFlow() throws Exception {
-    CoreEvent event = flowRunner("test").withPayload("ABCDEF").run();
-  }
-
 }
